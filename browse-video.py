@@ -3,6 +3,9 @@ from tkinter import filedialog
 
 
 
+
+
+
 global path 
 def browse_button():
 	path = filedialog.askopenfilename(initialdir="/",filetypes =(("Text File", "*.txt"),("Video File",".mp4"),("All Files","*.*")),title = "Choose a file.")
@@ -23,7 +26,5 @@ btn = Button(window,text="BROWSE",command=browse_button)
 btn.grid(column =10, row =5)
 E1 = Entry(window,text="",width=40)
 E1.grid(column=10,row = 7)
-
-
 
 window.mainloop()
