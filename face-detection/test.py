@@ -9,6 +9,8 @@ from tkinter import END
 import imutils
 import mxnet as mx
 import align.detect_face
+import time
+
 from mtcnn_detector import MtcnnDetector
 
 count = 0
@@ -19,27 +21,59 @@ class App:
         self.window = window
         self.window.geometry('1000x1000')
         self.window.title(window_title)
+        #self.window.state("-zoomed",True)
+        #self.window.attributes('-fullscreen', True)
         
          
        # Create a canvas that can fit the above video source size
-        self.canvas = tkinter.Canvas(window, width = 500, height = 500)
-        self.canvas.grid(column =0, row =10)
- 
-       
-        self.label=tkinter.Label(window, text="choose MP4 file")
-        self.label.grid(column = 0, row=0)
+        self.label=tkinter.Label(window, text="PROJECT : FACE RECOGNITION")
+        self.label.place(x=0,y=0)
 
-        self.label1=tkinter.Entry(window, text="", width=70)
-        self.label1.grid(column=0,row=8)
+        self.tit=tkinter.Label(window, text="CHOOSE A MP4 FILE :")
+        self.tit.place(x=0,y=30)
 
-        self.label2=tkinter.Label(window,text="number of face detected")
-        self.label2.grid(column=1,row=20)
+        self.btn_browse=tkinter.Button(window,text="BROWSE",width=20,command=self.browse_button)
+        self.btn_browse.place(x=150,y=30)
+
+        self.labelor=tkinter.Label(window,text="OR")
+        self.labelor.place(x=350,y=30)
+
+        self.btn_live=tkinter.Button(window,text="LIVE",width=20,command=self.live)
+        self.btn_live.place(x=400,y=30)
+
+        self.label1=tkinter.Entry(window, text="", width=80)
+        self.label1.place(x=0,y=70)
+
+        self.canvas = tkinter.Canvas(window, width = 650, height = 500)
+        self.canvas.place(x=0,y=100)
+
+   
+        self.label2=tkinter.Label(window,text="S.NO")
+        self.label2.place(x=700,y=500)
+
+        self.sno=tkinter.Entry(window,text="",width=10)
+        self.sno.place(x=700,y=520)
+
+        self.label3=tkinter.Label(window,text="TIME")
+        self.label3.place(x=750,y=500)
+
+        self.time=tkinter.Entry(window,text="",width =20)
+        self.time.place(x=750,y=520)
+
+
+        self.label4=tkinter.Label(window,text="FACES")
+        self.label4.place(x=920,y=500)
 
         self.no_face=tkinter.Entry(window,text="",width =20)
-        self.no_face.grid(column=2,row=20)
+        self.no_face.place(x=920,y=520)
+
         
-        self.btn_browse=tkinter.Button(window,text="BROWSE",width=20,command=self.browse_button)
-        self.btn_browse.grid(column =0, row =5)
+        
+
+        
+
+        
+        
        # After it is called once, the update method will be automatically called every delay milliseconds
         self.delay = 15
         
@@ -48,17 +82,31 @@ class App:
     def browse_button(self):
        self.path = filedialog.askopenfilename(initialdir="/",filetypes =(("Text File", "*.txt"),("Video File",".mp4"),("All Files","*.*")),title = "Choose a file.")
        self.vid = MyVideoCapture(str(self.path))
+       self.sno.insert(0,str("1."))
        self.update()
        print(self.path)
        self.label1.delete(0,END) #remove current text in entry 
        self.label1.insert(0,self.path) #insert the path
 
+    def live(self):
+      self.vid = MyVideoCapture("rtsp://admin:admin0864@103.60.63.138:8081/cam/realmonitor?channel=1&subtype=0")
+      self.update()
+
     
     def update(self):
        # Get a frame from the video source
        global count
+
        self.no_face.delete(0,END)
        self.no_face.insert(0,count)
+       #self.sno.delete(0,END)
+       #self.sno.insert(0,self.sno)
+       self.time.delete(0,END)
+       self.time1 =time.strftime('%H:%M:%S%p')
+       self.time.insert(0,str(self.time1))
+       print(str(self.time1))
+
+       
        ret, frame = self.vid.get_frame()
  
        if ret:
@@ -81,7 +129,7 @@ class MyVideoCapture:
     def get_frame(self):
         if self.vid.isOpened():
             ret, frame = self.vid.read()
-            img = cv2.resize(frame, (640,640))
+            img = cv2.resize(frame, (650,500))
             (h, w) = img.shape[:2]
 
 
@@ -94,6 +142,7 @@ class MyVideoCapture:
               points = results[1]
               global count
               count = 0
+
       
               draw = img.copy()
               for b in total_boxes:
@@ -112,16 +161,11 @@ class MyVideoCapture:
                   cv2.circle(draw, centroid, 4, (0, 255, 0), -1)
                   print("no_face:",count)
                   cv2.putText(draw, "count = "+str(count), (0, 20),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                  img = draw
                 
-
-                  frame = cv2.resize(draw,(500,500),interpolation = cv2.INTER_AREA)
-
-
-
-                  frame = cv2.resize(frame,(500,500),interpolation = cv2.INTER_AREA)
             if ret:
                 # Return a boolean success flag and the current frame converted to BGR
-                return (ret, cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
+                return (ret, cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             else:
                 return (ret, None)
         else:
@@ -133,4 +177,4 @@ class MyVideoCapture:
             self.vid.release()
  
 # Create a window and pass it to the Application object
-App(tkinter.Tk(), "FACE-RECOGNITION-GUI")
+App(tkinter.Tk(), "KATOMARAN ROBOTICS AND BUSSINESS SOLUTION")
